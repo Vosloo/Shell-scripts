@@ -1,0 +1,30 @@
+#!/bin/bash
+
+display_help() {
+    echo "Script for converting video format for all files matching the extension in given dir"
+    echo -e "\nUsage: extchg /path/to/dir source_ext target_ext"
+    exit 1
+}
+
+if [[ $1 == "-h" || $1 == "--help" || $# -eq 0 ]]; then
+    display_help
+elif [[ $# -lt 3 ]]; then
+    echo "You must specify directory path, original extension and target extension!"
+    exit 1
+fi
+
+if [[ -z $(find "$1/" -name "*.$2") ]]
+then
+    echo "No files found with pattern: $1/*.$2"
+    echo "Aborting!"
+    exit 1
+fi
+
+for file in "$1"/*."$2"
+do
+    filename=$(basename "$file" ".$2")
+    echo "Converting '$(basename "$file")' to '$filename.$3'..."
+    ffmpeg -loglevel warning -i "$file" "$filename.$3"
+    rm "$file"
+    echo "Done"
+done
